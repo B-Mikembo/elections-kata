@@ -16,7 +16,7 @@ class ElectionsTest {
                 "District 2", Arrays.asList("Jerry", "Simon"),
                 "District 3", Arrays.asList("Johnny", "Matt", "Carole")
         );
-        Elections elections = new Elections(list, false);
+        Elections elections = new ElectionsWithDistrict(list, false);
         elections.addCandidate("Michel");
         elections.addCandidate("Jerry");
         elections.addCandidate("Johnny");
@@ -49,7 +49,7 @@ class ElectionsTest {
                 "District 2", Arrays.asList("Jerry", "Simon"),
                 "District 3", Arrays.asList("Johnny", "Matt", "Carole")
         );
-        Elections elections = new Elections(list, true);
+        Elections elections = new ElectionsWithDistrict(list, true);
         elections.addCandidate("Michel");
         elections.addCandidate("Jerry");
         elections.addCandidate("Johnny");
