@@ -29,25 +29,25 @@ public class ElectionsWithDistrict extends Elections {
     }
 
     private void voteForCandidate(String candidate, String electorDistrict) {
-        ArrayList<Integer> districtVotes = votesByDistrict.get(electorDistrict);
+        var currentDistrictVotes = votesByDistrict.get(electorDistrict);
         if (isCandidateExisted(candidate)) {
-            voteForExistingCandidate(candidate, districtVotes);
+            voteForExistingCandidate(candidate, currentDistrictVotes);
         } else {
-            voteForNotExistingCandidate(candidate, districtVotes);
+            voteForNotExistingCandidate(candidate, currentDistrictVotes);
         }
     }
 
-    private void voteForNotExistingCandidate(String candidate, ArrayList<Integer> districtVotes) {
+    private void voteForNotExistingCandidate(String candidate, ArrayList<Integer> currentDistrictVotes) {
         candidates.add(candidate);
         votesByDistrict.forEach((district, votes) -> {
             votes.add(0);
         });
-        districtVotes.set(candidates.size() - 1, districtVotes.get(candidates.size() - 1) + 1);
+        currentDistrictVotes.set(candidates.size() - 1, currentDistrictVotes.get(candidates.size() - 1) + 1);
     }
 
-    private void voteForExistingCandidate(String candidate, ArrayList<Integer> districtVotes) {
+    private void voteForExistingCandidate(String candidate, ArrayList<Integer> currentDistrictVotes) {
         int index = candidates.indexOf(candidate);
-        districtVotes.set(index, districtVotes.get(index) + 1);
+        currentDistrictVotes.set(index, currentDistrictVotes.get(index) + 1);
     }
 
     private boolean isCandidateExisted(String candidate) {

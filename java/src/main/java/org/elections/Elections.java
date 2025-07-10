@@ -11,11 +11,12 @@ public abstract class Elections {
         this.electorsByDistrict = electorsByDistrict;
     }
 
-    public static Elections createElections(Map<String, List<String>> electorsByDistrict, boolean withDistrict) {
-        if (withDistrict) {
-            return new ElectionsWithDistrict(electorsByDistrict);
-        }
+    public static ElectionsWithoutDistrict createElectionsWithoutDistrict(Map<String, List<String>> electorsByDistrict) {
         return new ElectionsWithoutDistrict(electorsByDistrict);
+    }
+
+    public static ElectionsWithDistrict createElectionsWithDistrict(Map<String, List<String>> electorsByDistrict) {
+        return new ElectionsWithDistrict(electorsByDistrict);
     }
 
     public void addCandidate(String candidate) {
