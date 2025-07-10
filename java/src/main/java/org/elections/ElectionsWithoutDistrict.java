@@ -26,57 +26,61 @@ public class ElectionsWithoutDistrict extends Elections {
     @Override
     public Map<String, String> results() {
         int nbVotes = votesWithoutDistricts.stream().reduce(0, Integer::sum);
-        var results = totalForEachOfficialCandidate();
+        var resultByOfficialCandidate = totalForEachOfficialCandidate();
 
         float blankResult = ((float) totalBlankVote() * 100) / nbVotes;
-        results.put("Blank", String.format(Locale.FRENCH, "%.2f%%", blankResult));
+        resultByOfficialCandidate.put("Blank", String.format(Locale.FRENCH, "%.2f%%", blankResult));
 
         float nullResult = ((float) totalNullVote() * 100) / nbVotes;
-        results.put("Null", String.format(Locale.FRENCH, "%.2f%%", nullResult));
+        resultByOfficialCandidate.put("Null", String.format(Locale.FRENCH, "%.2f%%", nullResult));
 
         int nbElectors = list.values().stream().map(List::size).reduce(0, Integer::sum);
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
         float abstentionResult = 100 - ((float) nbVotes * 100 / nbElectors);
-        results.put("Abstention", String.format(Locale.FRENCH, "%.2f%%", abstentionResult));
+        resultByOfficialCandidate.put("Abstention", String.format(Locale.FRENCH, "%.2f%%", abstentionResult));
 
-        return results;
+        return resultByOfficialCandidate;
     }
 
     private Integer totalNullVote() {
         var nullVotes = 0;
         for (int i = 0; i < votesWithoutDistricts.size(); i++) {
-            String candidate = candidates.get(i);
-            if (!officialCandidates.contains(candidate)) {
-                if (!candidates.get(i).isEmpty()) {
-                    nullVotes += votesWithoutDistricts.get(i);
-                }
+            var currentCandidate = candidates.get(i);
+            if (isNullVote(currentCandidate, i)) {
+                nullVotes += votesWithoutDistricts.get(i);
             }
         }
         return nullVotes;
     }
 
+    private boolean isNullVote(String candidate, int i) {
+        return !officialCandidates.contains(candidate) && !candidates.get(i).isEmpty();
+    }
+
     private Integer totalBlankVote() {
         var blankVotes = 0;
         for (int i = 0; i < votesWithoutDistricts.size(); i++) {
-            String candidate = candidates.get(i);
-            if (!officialCandidates.contains(candidate)) {
-                if (candidates.get(i).isEmpty()) {
-                    blankVotes += votesWithoutDistricts.get(i);
-                }
+            var currentCandidate = candidates.get(i);
+            if (isBlankVote(currentCandidate, i)) {
+                blankVotes += votesWithoutDistricts.get(i);
             }
         }
         return blankVotes;
+    }
+
+    private boolean isBlankVote(String candidate, int i) {
+        return !officialCandidates.contains(candidate) && candidates.get(i).isEmpty();
     }
 
     private Map<String, String> totalForEachOfficialCandidate() {
         var results = new HashMap<String, String>();
         var nbValidVotes = totalValidVote();
         for (int i = 0; i < votesWithoutDistricts.size(); i++) {
-            Float candidatResult = ((float) votesWithoutDistricts.get(i) * 100) / nbValidVotes;
-            String candidate = candidates.get(i);
+            var candidateResult = ((float) votesWithoutDistricts.get(i) * 100) / nbValidVotes;
+            var candidate = candidates.get(i);
             if (officialCandidates.contains(candidate)) {
-                results.put(candidate, String.format(Locale.FRENCH, "%.2f%%", candidatResult));
+                results.put(candidate, String.format(Locale.FRENCH, "%.2f%%", candidateResult));
             }
         }
         return results;
