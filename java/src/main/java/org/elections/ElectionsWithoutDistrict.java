@@ -1,6 +1,5 @@
 package org.elections;
 
-import java.sql.Array;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -39,7 +38,7 @@ public class ElectionsWithoutDistrict extends Elections {
         float nullResult = ((float) totalNullVote() * 100) / nbVotes;
         resultByOfficialCandidate.put("Null", String.format(Locale.FRENCH, "%.2f%%", nullResult));
 
-        int nbElectors = list.values().stream().map(List::size).reduce(0, Integer::sum);
+        int nbElectors = electorsByDistrict.values().stream().map(List::size).reduce(0, Integer::sum);
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
         float abstentionResult = 100 - ((float) nbVotes * 100 / nbElectors);
