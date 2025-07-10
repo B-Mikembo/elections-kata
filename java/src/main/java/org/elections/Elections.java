@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 public class Elections {
-    public Elections(Map<String, List<String>> list, boolean withDistrict) {
+    protected Elections(Map<String, List<String>> list, boolean withDistrict) {
         votesWithDistricts = new HashMap<>();
         this.list = list;
         this.withDistrict = withDistrict;
@@ -20,6 +20,13 @@ public class Elections {
         votesWithDistricts.get("District 1").add(0);
         votesWithDistricts.get("District 2").add(0);
         votesWithDistricts.get("District 3").add(0);
+    }
+
+    public static Elections createElections(Map<String, List<String>> list, boolean withDistrict) {
+        if(withDistrict) {
+            return new ElectionsWithDistrict(list, withDistrict);
+        }
+        return new ElectionsWithoutDistrict(list, withDistrict);
     }
 
     public Map<String, String> results() {
