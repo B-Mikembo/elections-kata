@@ -1,31 +1,36 @@
 package org.elections;
 
+import java.sql.Array;
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class ElectionsWithoutDistrict extends Elections {
-    public ElectionsWithoutDistrict(Map<String, List<String>> list, boolean withDistrict) {
-        super(list, withDistrict);
+    private final List<Integer> votes;
 
+    public ElectionsWithoutDistrict(Map<String, List<String>> list) {
+        super(list);
+        votes = new ArrayList<>();
+    }
+
+    @Override
+    protected void addVote() {
+        votes.add(0);
     }
 
     @Override
     public void voteFor(String elector, String candidate, String electorDistrict) {
         if (candidates.contains(candidate)) {
             int index = candidates.indexOf(candidate);
-            votesWithoutDistricts.set(index, votesWithoutDistricts.get(index) + 1);
+            votes.set(index, votes.get(index) + 1);
         } else {
             candidates.add(candidate);
-            votesWithoutDistricts.add(1);
+            votes.add(1);
         }
     }
 
     @Override
     public Map<String, String> results() {
-        int nbVotes = votesWithoutDistricts.stream().reduce(0, Integer::sum);
+        int nbVotes = votes.stream().reduce(0, Integer::sum);
         var resultByOfficialCandidate = totalForEachOfficialCandidate();
 
         float blankResult = ((float) totalBlankVote() * 100) / nbVotes;
@@ -45,10 +50,10 @@ public class ElectionsWithoutDistrict extends Elections {
 
     private Integer totalNullVote() {
         var nullVotes = 0;
-        for (int i = 0; i < votesWithoutDistricts.size(); i++) {
+        for (int i = 0; i < votes.size(); i++) {
             var currentCandidate = candidates.get(i);
             if (isNullVote(currentCandidate, i)) {
-                nullVotes += votesWithoutDistricts.get(i);
+                nullVotes += votes.get(i);
             }
         }
         return nullVotes;
@@ -60,10 +65,10 @@ public class ElectionsWithoutDistrict extends Elections {
 
     private Integer totalBlankVote() {
         var blankVotes = 0;
-        for (int i = 0; i < votesWithoutDistricts.size(); i++) {
+        for (int i = 0; i < votes.size(); i++) {
             var currentCandidate = candidates.get(i);
             if (isBlankVote(currentCandidate, i)) {
-                blankVotes += votesWithoutDistricts.get(i);
+                blankVotes += votes.get(i);
             }
         }
         return blankVotes;
@@ -76,8 +81,8 @@ public class ElectionsWithoutDistrict extends Elections {
     private Map<String, String> totalForEachOfficialCandidate() {
         var results = new HashMap<String, String>();
         var nbValidVotes = totalValidVote();
-        for (int i = 0; i < votesWithoutDistricts.size(); i++) {
-            var candidateResult = ((float) votesWithoutDistricts.get(i) * 100) / nbValidVotes;
+        for (int i = 0; i < votes.size(); i++) {
+            var candidateResult = ((float) votes.get(i) * 100) / nbValidVotes;
             var candidate = candidates.get(i);
             if (officialCandidates.contains(candidate)) {
                 results.put(candidate, String.format(Locale.FRENCH, "%.2f%%", candidateResult));
@@ -90,7 +95,7 @@ public class ElectionsWithoutDistrict extends Elections {
         var nbValidVotes = 0;
         for (String officialCandidate : officialCandidates) {
             int index = candidates.indexOf(officialCandidate);
-            nbValidVotes += votesWithoutDistricts.get(index);
+            nbValidVotes += votes.get(index);
         }
         return nbValidVotes;
     }

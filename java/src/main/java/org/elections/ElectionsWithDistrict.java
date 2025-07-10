@@ -4,9 +4,21 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 public class ElectionsWithDistrict extends Elections {
+    private final Map<String, ArrayList<Integer>> votesWithDistricts;
 
-    public ElectionsWithDistrict(Map<String, List<String>> list, boolean withDistrict) {
-        super(list, withDistrict);
+    public ElectionsWithDistrict(Map<String, List<String>> list) {
+        super(list);
+        votesWithDistricts = new HashMap<>();
+        votesWithDistricts.put("District 1", new ArrayList<>());
+        votesWithDistricts.put("District 2", new ArrayList<>());
+        votesWithDistricts.put("District 3", new ArrayList<>());
+    }
+
+    @Override
+    protected void addVote() {
+        votesWithDistricts.get("District 1").add(0);
+        votesWithDistricts.get("District 2").add(0);
+        votesWithDistricts.get("District 3").add(0);
     }
 
     @Override
