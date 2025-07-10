@@ -8,4 +8,15 @@ public class ElectionsWithoutDistrict extends Elections {
         super(list, withDistrict);
 
     }
+
+    @Override
+    public void voteFor(String elector, String candidate, String electorDistrict) {
+        if (candidates.contains(candidate)) {
+            int index = candidates.indexOf(candidate);
+            votesWithoutDistricts.set(index, votesWithoutDistricts.get(index) + 1);
+        } else {
+            candidates.add(candidate);
+            votesWithoutDistricts.add(1);
+        }
+    }
 }

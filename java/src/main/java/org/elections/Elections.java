@@ -3,7 +3,14 @@ package org.elections;
 import java.text.DecimalFormat;
 import java.util.*;
 
-public class Elections {
+public abstract class Elections {
+    protected List<String> candidates = new ArrayList<>();
+    protected List<String> officialCandidates = new ArrayList<>();
+    protected ArrayList<Integer> votesWithoutDistricts = new ArrayList<>();
+    protected Map<String, ArrayList<Integer>> votesWithDistricts;
+    protected Map<String, List<String>> list;
+    protected boolean withDistrict;
+
     protected Elections(Map<String, List<String>> list, boolean withDistrict) {
         votesWithDistricts = new HashMap<>();
         this.list = list;
@@ -13,6 +20,13 @@ public class Elections {
         votesWithDistricts.put("District 3", new ArrayList<>());
     }
 
+    public static Elections createElections(Map<String, List<String>> list, boolean withDistrict) {
+        if (withDistrict) {
+            return new ElectionsWithDistrict(list, withDistrict);
+        }
+        return new ElectionsWithoutDistrict(list, withDistrict);
+    }
+
     public void addCandidate(String candidate) {
         officialCandidates.add(candidate);
         candidates.add(candidate);
@@ -20,13 +34,6 @@ public class Elections {
         votesWithDistricts.get("District 1").add(0);
         votesWithDistricts.get("District 2").add(0);
         votesWithDistricts.get("District 3").add(0);
-    }
-
-    public static Elections createElections(Map<String, List<String>> list, boolean withDistrict) {
-        if(withDistrict) {
-            return new ElectionsWithDistrict(list, withDistrict);
-        }
-        return new ElectionsWithoutDistrict(list, withDistrict);
     }
 
     public Map<String, String> results() {
@@ -79,8 +86,7 @@ public class Elections {
                 ArrayList<Integer> districtVotes = entry.getValue();
                 for (int i = 0; i < districtVotes.size(); i++) {
                     float candidateResult = 0;
-                    if (nbValidVotes != 0)
-                        candidateResult = ((float) districtVotes.get(i) * 100) / nbValidVotes;
+                    if (nbValidVotes != 0) candidateResult = ((float) districtVotes.get(i) * 100) / nbValidVotes;
                     String candidate = candidates.get(i);
                     if (officialCandidates.contains(candidate)) {
                         districtResult.add(candidateResult);
@@ -94,8 +100,7 @@ public class Elections {
                 }
                 int districtWinnerIndex = 0;
                 for (int i = 1; i < districtResult.size(); i++) {
-                    if (districtResult.get(districtWinnerIndex) < districtResult.get(i))
-                        districtWinnerIndex = i;
+                    if (districtResult.get(districtWinnerIndex) < districtResult.get(i)) districtWinnerIndex = i;
                 }
                 officialCandidatesResult.put(candidates.get(districtWinnerIndex), officialCandidatesResult.get(candidates.get(districtWinnerIndex)) + 1);
             }
@@ -120,36 +125,6 @@ public class Elections {
         return results;
     }
 
-    public void voteFor(String elector, String candidate, String electorDistrict) {
-        if (!withDistrict) {
-            if (candidates.contains(candidate)) {
-                int index = candidates.indexOf(candidate);
-                votesWithoutDistricts.set(index, votesWithoutDistricts.get(index) + 1);
-            } else {
-                candidates.add(candidate);
-                votesWithoutDistricts.add(1);
-            }
-        } else {
-            if (votesWithDistricts.containsKey(electorDistrict)) {
-                ArrayList<Integer> districtVotes = votesWithDistricts.get(electorDistrict);
-                if (candidates.contains(candidate)) {
-                    int index = candidates.indexOf(candidate);
-                    districtVotes.set(index, districtVotes.get(index) + 1);
-                } else {
-                    candidates.add(candidate);
-                    votesWithDistricts.forEach((district, votes) -> {
-                        votes.add(0);
-                    });
-                    districtVotes.set(candidates.size() - 1, districtVotes.get(candidates.size() - 1) + 1);
-                }
-            }
-        }
-    }
+    public abstract void voteFor(String elector, String candidate, String electorDistrict);
 
-    List<String> candidates = new ArrayList<>();
-    List<String> officialCandidates = new ArrayList<>();
-    ArrayList<Integer> votesWithoutDistricts = new ArrayList<>();
-    Map<String, ArrayList<Integer>> votesWithDistricts;
-    protected Map<String, List<String>> list;
-    protected boolean withDistrict;
 }
