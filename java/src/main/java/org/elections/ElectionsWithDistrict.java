@@ -23,19 +23,39 @@ public class ElectionsWithDistrict extends Elections {
 
     @Override
     public void voteFor(String elector, String candidate, String electorDistrict) {
-        if (votesByDistrict.containsKey(electorDistrict)) {
-            ArrayList<Integer> districtVotes = votesByDistrict.get(electorDistrict);
-            if (candidates.contains(candidate)) {
-                int index = candidates.indexOf(candidate);
-                districtVotes.set(index, districtVotes.get(index) + 1);
-            } else {
-                candidates.add(candidate);
-                votesByDistrict.forEach((district, votes) -> {
-                    votes.add(0);
-                });
-                districtVotes.set(candidates.size() - 1, districtVotes.get(candidates.size() - 1) + 1);
-            }
+        if (isElectorDistrictExisted(electorDistrict)) {
+            voteForCandidate(candidate, electorDistrict);
         }
+    }
+
+    private void voteForCandidate(String candidate, String electorDistrict) {
+        ArrayList<Integer> districtVotes = votesByDistrict.get(electorDistrict);
+        if (isCandidateExisted(candidate)) {
+            voteForExistingCandidate(candidate, districtVotes);
+        } else {
+            voteForNotExistingCandidate(candidate, districtVotes);
+        }
+    }
+
+    private void voteForNotExistingCandidate(String candidate, ArrayList<Integer> districtVotes) {
+        candidates.add(candidate);
+        votesByDistrict.forEach((district, votes) -> {
+            votes.add(0);
+        });
+        districtVotes.set(candidates.size() - 1, districtVotes.get(candidates.size() - 1) + 1);
+    }
+
+    private void voteForExistingCandidate(String candidate, ArrayList<Integer> districtVotes) {
+        int index = candidates.indexOf(candidate);
+        districtVotes.set(index, districtVotes.get(index) + 1);
+    }
+
+    private boolean isCandidateExisted(String candidate) {
+        return candidates.contains(candidate);
+    }
+
+    private boolean isElectorDistrictExisted(String electorDistrict) {
+        return votesByDistrict.containsKey(electorDistrict);
     }
 
     @Override
